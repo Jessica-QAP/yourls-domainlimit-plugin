@@ -1,17 +1,17 @@
 <?php
 /*
 Plugin Name: Domain Limiter
-Plugin URI: https://github.com/nicwaller/yourls-domainlimit-plugin
-Description: Only allow URLs from admin-specified domains
-Version: 1.1.0
-Author: nicwaller
-Author URI: https://github.com/nicwaller
+Plugin URI: https://github.com/Jessica-QAP/yourls-domainlimit-plugin
+Description: Only allow URLs from admin-specified domains, with an admin panel. Based on the Domain Limiter plugin by nicwaller.
+Version: 1.0
+Author: QAP
+Author URI: http://github.com/Jessica-QAP
 */
 
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
-yourls_add_filter( 'shunt_add_new_link', 'domainlimit_link_filter' );
+yourls_add_filter( 'pre_add_new_link', 'domainlimit_link_filter' );
 
 function domainlimit_link_filter( $original_return, $url, $keyword = '', $title = '' ) {
 	if ( domainlimit_environment_check() != true ) {
@@ -23,29 +23,10 @@ function domainlimit_link_filter( $original_return, $url, $keyword = '', $title 
 		return $err;
 	}
 
-	// If the user is exempt, don't even bother checking.
-	global $domainlimit_exempt_users;
-	if ( in_array( YOURLS_USER, $domainlimit_exempt_users ) ) {
-		return $original_return;
-	}
-
 	global $domainlimit_list;
 	$domain_whitelist = $domainlimit_list;
-
-	// The plugin hook gives us the raw URL input by the user, but
-	// it needs some cleanup before it's suitable for parse_url().
-	$url = yourls_encodeURI( $url );
-	$url = yourls_escape( yourls_sanitize_url( $url) );
-	if ( !$url || $url == 'http://' || $url == 'https://' ) {
-		$return['status']    = 'fail';
-		$return['code']      = 'error:nourl';
-		$return['message']   = yourls__( 'Missing or malformed URL' );
-		$return['errorCode'] = '400';
-		return yourls_apply_filter( 'add_new_link_fail_nourl', $return, $url, $keyword, $title );
-	}
-
+	$requested_domain = yourls_get_domain( $url );
 	$allowed = false;
-	$requested_domain = parse_url($url, PHP_URL_HOST);
 	foreach ( $domain_whitelist as $domain_permitted ) {
 		if ( domainlimit_is_subdomain( $requested_domain, $domain_permitted ) ) {
 			$allowed = true;
@@ -54,7 +35,7 @@ function domainlimit_link_filter( $original_return, $url, $keyword = '', $title 
 	}
 
 	if ( $allowed == true ) {
-		return $original_return;
+		return null;
 	}
 
 	$return = array();
@@ -73,7 +54,7 @@ function domainlimit_is_subdomain( $test_domain, $parent_domain ) {
 		return true;
 	}
 
-	// note that "notunbc.ca" is NOT a subdomain of "unbc.ca"
+	// Note that "notunbc.ca" is NOT a subdomain of "unbc.ca"
 	// We CANNOT just compare the rightmost characters
 	// unless we add a period in there first
 	if ( substr( $parent_domain, 1, 1) != '.' ) {
@@ -84,17 +65,57 @@ function domainlimit_is_subdomain( $test_domain, $parent_domain ) {
 	return ( $parent_domain == substr( $test_domain, 0-$chklen ) );
 }
 
-// returns true if everything is configured right
+/*
+ * Returns true if everything is configured correctly
+ */
 function domainlimit_environment_check() {
+	// Domain limit exempt users
+	global $domainlimit_exempt_users;
+	if ( isset( $domainlimit_exempt_users ) && !is_array( $domainlimit_exempt_users ) ) {
+		$domain = $domainlimit_exempt_users;
+		$domainlimit_exempt_users = array( $domain );
+	}
+
+	// Domain limit list
 	global $domainlimit_list;
 	if ( !isset( $domainlimit_list ) ) {
 		error_log('Missing definition of $domainlimit_list in user/config.php');
 		return false;
 	} else if ( isset( $domainlimit_list ) && !is_array( $domainlimit_list ) ) {
-		// be friendly and allow non-array definitions
 		$domain = $domainlimit_list;
 		$domainlimit_list = array( $domain );
-		return true;
 	}
 	return true;
+}
+
+/*
+ * Register the plugin admin page
+ */
+yourls_add_action( 'plugins_loaded', 'domainlimit_init' );
+function domainlimit_init() {
+    yourls_register_plugin_page( 'domainlimit', 'Domain Limiter Settings', 'domainlimit_display_page' );
+}
+
+/*
+ * Draw the plugin admin page
+ */
+function domainlimit_display_page() {
+	$test_variable = array('one', 'two', 'three');
+	global $domainlimit_list;
+	global $domainlimit_exempt_users;
+	//$test_variable = 'one';
+
+	?>
+	<h3><?php yourls_e( 'Domain Limiter Settings Test Test Test' ); ?></h3>
+	<?php if( domainlimit_environment_check() != true ) { ?>
+		<p><?php yourls_e( "Error in domain limit configuration"); ?></p>
+	<?php } else { ?>
+		<p><?php echo $domainlimit_exempt_users; ?></p>
+		<p><?php yourls_se( "Domains allowed to be shortened: %s", implode(", ", $domainlimit_list) ); ?></p>
+		<?php if( !is_null($domainlimit_exempt_users) ) { ?>
+			<p><?php yourls_se( "Users exempt from domain limit: %s", implode(", ", $domainlimit_exempt_users) ); ?></p>
+			<p><?php yourls_se( "Current user (%s) %s exempt from domain limit", YOURLS_USER, in_array( YOURLS_USER, $domainlimit_exempt_users ) ? "" : "not" ); ?></p>
+		<?php } ?>
+	<?php } ?>
+	<?php
 }
