@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Domain Limiter
-Plugin URI: https://github.com/Jessica-QAP/yourls-domainlimit-plugin
-Description: Only allow URLs from admin-specified domains, with an admin panel. Based on the Domain Limiter plugin by nicwaller.
+Plugin Name: Domain Limiter YOURLS Plugin
+Plugin URI: https://github.com/beanworks/yourls-domainlimit-plugin
+Description: Only allow URLs from admin-specified domains, with an admin panel. Based on the plugin by nicwaller.
 Version: 1.0
-Author: QAP
-Author URI: http://github.com/Jessica-QAP
+Author: Beanworks
+Author URI: http://github.com/beanworks
 */
 
 // No direct call
@@ -100,13 +100,11 @@ function domainlimit_init() {
  * Draw the plugin admin page
  */
 function domainlimit_display_page() {
-	$test_variable = array('one', 'two', 'three');
 	global $domainlimit_list;
 	global $domainlimit_exempt_users;
-	//$test_variable = 'one';
 
 	?>
-	<h3><?php yourls_e( 'Domain Limiter Settings Test Test Test' ); ?></h3>
+	<h3><?php yourls_e( 'Domain Limiter Settings' ); ?></h3>
 	<?php if( domainlimit_environment_check() != true ) { ?>
 		<p><?php yourls_e( "Error in domain limit configuration"); ?></p>
 	<?php } else { ?>
