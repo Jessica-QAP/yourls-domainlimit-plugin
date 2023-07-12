@@ -5,9 +5,10 @@ This plugin for [YOURLS](https://github.com/YOURLS/YOURLS) limits the creation o
 
 Configuration
 ------------
-1. Define an array of allowed domains in user/config called domainlimit_list. For example, `$domainlimit_list = array( 'mydomain.com', 'otherdomain.com' );`
-2. Optionally defined a list of usernames that are exempt from this restriction. For example, `domainlimit_exempt_users = array( 'bobadmin' );`
-3. Activate the plugin with the plugin manager in the admin interface.
+1. Install the plugin in user/plugins in a folder called domainlimit
+2. Define an array of allowed domains in user/config called domainlimit_list. For example, `$domainlimit_list = array( 'mydomain.com', 'otherdomain.com' );`
+3. Optionally defined a list of usernames that are exempt from this restriction. For example, `domainlimit_exempt_users = array( 'bobadmin' );`
+4. Activate the plugin with the plugin manager in the admin interface.
 
 License
 -------
@@ -25,3 +26,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+<sub>Based on plugin by nicwaller</sub>
