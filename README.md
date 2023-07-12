@@ -1,23 +1,13 @@
-yourls-domainlimit-plugin
+domainlimit-yourls-plugin
 =========================
 
-This plugin for [YOURLS](https://github.com/YOURLS/YOURLS) limits the creation of shorturls to a list of domains that you define.
-
-You might want to limit the domains allowed for shortlinks so that your brand is not misused by people linking to resources outside your domain and outside your control.
-
-Installation
-------------
-1. Download the [latest release](https://github.com/nicwaller/yourls-domainlimit-plugin/releases)
-1. Copy the plugin folder into your user/plugins folder for YOURLS.
-1. Activate the plugin with the plugin manager in the admin interface.
+This plugin for [YOURLS](https://github.com/YOURLS/YOURLS) limits the creation of shorturls to a list of defined domains. Limiting the domains allowed for shortlinks helps prevent the service from being misued.
 
 Configuration
--------------
-Define a list of allowed domains in your user/config.php. For example:
-`$domainlimit_list = array( 'mydomain.com', 'otherdomain.com' );`
-
-You may also optionally specify a list of usernames that are exempt from this restriction.
-`domainlimit_exempt_users = array( 'bobadmin' );`
+------------
+1. Define an array of allowed domains in user/config called domainlimit_list. For example, `$domainlimit_list = array( 'mydomain.com', 'otherdomain.com' );`
+2. Optionally defined a list of usernames that are exempt from this restriction. For example, `domainlimit_exempt_users = array( 'bobadmin' );`
+3. Activate the plugin with the plugin manager in the admin interface.
 
 License
 -------
